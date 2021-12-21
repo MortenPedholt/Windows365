@@ -164,7 +164,7 @@ Set-AzVm -Name $TempVMName -ResourceGroupName $TempVM.ResourceGroupName -General
 #Create managed Image
 Write-Output "Creating Azure Managed Image from temp VM"
 $GeneralizedVM = Get-azvm -name $TempVMName -ResourceGroupName $TempVM.ResourceGroupName
-$image = New-AzImageConfig -Location $GeneralizedVM.location -SourceVirtualMachineId $GeneralizedVM.Id
+$image = New-AzImageConfig -Location $GeneralizedVM.location -SourceVirtualMachineId $GeneralizedVM.Id -HyperVGeneration V2
 New-AzImage -Image $image -ImageName $NewImageName -ResourceGroupName $GeneralizedVM.resourcegroupname | out-null
  
 #Delete Temp ressources
