@@ -1,16 +1,19 @@
 # Update Notes
 
 ## 14 July 2022
-This script has been updated to leverage more Microsoft Graph API call instead of AzureAD PowerShell modules. This make it easier for running it with Service Principals.
+This script has been updated with the following improvement and fixed: 
+
+- Fixed an issue where "Quit" dident work properly and was in a endless loop
+- Instead of connecting with AzureADPreview module the script now only uses Microsoft Graph API calls in the script.
+  View the required permissions at "Microsoft Graph Permissions" section below.
+  By doing this change it's now possible to modify the script to connect with a Service Principal instead of a user account.
 
 # Windows 365 Resize group-based licensed
 Currently Windows 365 does not support resize in MEM portal if users have been assigned a license through group-based licensed.
 This script is a workaround to resize those users.
 This script has many interactions in the PowerShell console, so it's currently not supported in an automated task.
 
-This script is provided as an example.
-
-## Required PowerShell Modules and Microsoft Graph Permissions
+# Required PowerShell Modules and Microsoft Graph Permissions
 
 This script uses Microsoft.Graph. The script only installs the Microsoft.Graph modules it needs to run this script, not the entire Microsoft.Graph module. These modules are:
 
@@ -24,7 +27,7 @@ This script uses Microsoft.Graph. The script only installs the Microsoft.Graph m
 - Microsoft.Graph.DeviceManagement.Functions 
 
 
-## Microsoft Graph Permissions
+# Microsoft Graph Permissions
 
 The account you are running the script with needs to have the following Microsoft Graph API Permissions:
 
@@ -34,7 +37,7 @@ The account you are running the script with needs to have the following Microsof
 - User.ReadWrite.All
 - Organization.Read.All 
 
-## Usage
+# Usage
 
 When the script is run, it will check if the Microsoft.Graph modules are installed and will install them if not present.
 
