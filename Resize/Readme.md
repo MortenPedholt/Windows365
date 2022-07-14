@@ -20,7 +20,8 @@ This script uses Microsoft.Graph. The script only installs the Microsoft.Graph m
 - Microsoft.Graph.Users.Actions
 - Microsoft.Graph.DeviceManagement.Actions
 - Microsoft.Graph.DeviceManagement.Administration
-- Microsoft.Graph.Groups 
+- Microsoft.Graph.Groups
+- Microsoft.Graph.DeviceManagement.Functions 
 
 
 ## Microsoft Graph Permissions
