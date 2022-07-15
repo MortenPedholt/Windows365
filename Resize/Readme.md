@@ -3,10 +3,11 @@
 ## 14 July 2022
 This script has been updated with the following improvement and fixed: 
 
-- Fixed an issue where "Quit" dident work properly and was in a endless loop
+- Fixed an issue where "Quit" dident work properly and was in a endless loop.
 - Instead of connecting with AzureADPreview module the script now only uses Microsoft Graph API calls in the script.
   View the required permissions at "Microsoft Graph Permissions" section below.
   By doing this change it's now possible to modify the script to connect with a Service Principal instead of a user account.
+- Fixed wrong output when running the script.
 
 # Windows 365 Resize group-based licensed
 Currently Windows 365 does not support resize in MEM portal if users have been assigned a license through group-based licensed.
