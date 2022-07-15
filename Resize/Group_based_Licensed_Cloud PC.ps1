@@ -380,7 +380,7 @@ try {
             #Check licensgroup membership
             
            $GroupDetials = Get-MgGroup -Filter "DisplayName eq '$CurrentLicensGroup'"
-           $CheckCurrentlicensGroupMemberShip = Get-MgGroupMember -GroupId $GroupDetials.Id | Where-Object {$_.Id -eq $UserDetails.Id}
+           $CheckCurrentlicensGroupMemberShip = Get-MgGroupMember -GroupId $GroupDetials.Id -All | Where-Object {$_.Id -eq $UserDetails.Id}
             if (!($CheckCurrentlicensGroupMemberShip)) {
             Write-Host "Unable to find User in licens group $CurrentLicensGroup"
             Write-Host "ending script"
