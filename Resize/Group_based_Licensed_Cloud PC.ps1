@@ -1,4 +1,4 @@
-#Running this script is at your own risk
+ #Running this script is at your own risk
 #Please provide the AzureAD licens group name in the parameters.
 #This script only works with AzureAD Licens group Cloud-only.
 #This only works with Windows 365 Enterprise edition.
@@ -70,7 +70,7 @@ function connect-msgraph {
     if ($tenant.TenantId -eq $null) {
         write-output "Not connected to MS Graph. Connecting..." | out-host
         try {
-            Connect-MgGraph -Scopes "CloudPC.Read.All","CloudPC.ReadWrite.All" -ErrorAction Stop | Out-Null
+            Connect-MgGraph -Scopes $GraphAPIPermissions -ErrorAction Stop | Out-Null
         }
         catch {
             write-output "Failed to connect to MS Graph" | out-host
@@ -84,59 +84,7 @@ function connect-msgraph {
     Write-Output $text | out-host
 }
 
-#Function to connect to the MS.Graph PowerShell Enterprise App
-function connect-aad {
-    
-    try{
-        $AADtenant = Get-AzureADTenantDetail -ErrorAction Stop | Out-Null
-    }
-    catch{
-        write-output "Not connected to Azure AD. Connecting..." | out-host
-        try {
-            Connect-AzureAD -ErrorAction Stop | Out-Null
-        }
-        catch {
-            write-output "Failed to connect to Azure AD" | out-host
-            write-output $_.Exception.Message | out-host
-            Return 1
-        }
-    }
-   
-    $AADtenant = Get-AzureADTenantDetail
-    $text = "Tenant ID is " + $AADtenant.ObjectId
-    Write-Output "Connected to Azure AD" | out-host
-    Write-Output $text | out-host
-
-    }
-  
-
-#Function to check if AzureADPreview module is installed and up-to-date
-function invoke-AzureADPreview {
-    $AADPavailable = (find-module -name AzureADPreview)
-    $vertemp = $AADPavailable.version.ToString()
-    Write-Output "Latest version of AzureADPreview module is $vertemp" | out-host
-    $AADPcurrent = (get-installedmodule -name AzureADPreview -ErrorAction SilentlyContinue) 
-
-    if ($AADPcurrent -eq $null) {
-        write-output "AzureADPreview module is not installed. Installing..." | out-host
-        try {
-            Install-Module AzureADPreview -Force -ErrorAction Stop
-        }
-        catch {
-            write-output "Failed to install AzureADPreview Module" | out-host
-            write-output $_.Exception.Message | out-host
-            Return 1
-        }
-    }
-    $AADPcurrent = (get-installedmodule -name AzureADPreview)
-    $vertemp = $AADPcurrent.Version.ToString() 
-    write-output "Current installed version of AzureADPreview module is $vertemp" | out-host
-
-
-    if ($AADPavailable.Version -gt $AADPcurrent.Version) { write-host "There is an update to this module available." }
-    else
-    { write-output "The installed AzureADPreview module is up to date." | out-host }
-}
+ 
 
 #Function to set the profile to beta
 function set-profile {
@@ -144,40 +92,25 @@ function set-profile {
     Select-MgProfile -Name beta
 }
 
-#function to detect if AzureAD module is installed
-function invoke-azureadcheck {
-    try
-    {
-    Get-InstalledModule -Name AzureAD -ErrorAction Stop | Out-Null
-    Write-Host "AzureAD module is installed" -ForegroundColor Red
-    Return 1
-    }
-    
-    catch
-    {
-    Write-Host "AzureAD module is not installed"
-    Return 0
-    }   
-}
 
-$modules = @("Microsoft.Graph.DeviceManagement.Functions",
-                "Microsoft.Graph.DeviceManagement.Administration",
-                "Microsoft.Graph.DeviceManagement.Enrolment",
+$modules = @("Microsoft.Graph.authentication",
+                "Microsoft.Graph.Identity.DirectoryManagement",
+                "Microsoft.Graph.Users",
+                "Microsoft.Graph.Users.Actions",
                 "Microsoft.Graph.DeviceManagement.Actions",
-                "Microsoft.Graph.Users.Functions",
-                "Microsoft.Graph.Users.Actions"
+                "Microsoft.Graph.DeviceManagement.Administration",
+                "Microsoft.Graph.Groups",
+                "Microsoft.Graph.DeviceManagement.Functions"
             )
 
 $WarningPreference = 'SilentlyContinue'
 
-
-#Command to check if AzureAD module is installed and exit if it is.
-if (invoke-azureadcheck -eq 1) {
-    write-host "The AzureAD module is not compatibile with AzureADPreivew" -ForegroundColor Red
-    write-host "Please uninstall the AzureAD module, close all PowerShell sessions," -ForegroundColor Red
-    Write-Host "and run this script again" -ForegroundColor Red
-    Return 1
-}
+[String]$GraphAPIPermissions = @("Directory.Read.All",
+                                 "CloudPC.ReadWrite.All",
+                                 "User.ReadWrite.All",
+                                 "GroupMember.ReadWrite.All",
+                                 "Organization.Read.All")
+            
 
 
 #Commands to load MS.Graph modules
@@ -192,19 +125,10 @@ if (connect-msgraph -eq 1) {
     Return 1
 }
 
+#Set Graph Profile
 set-profile
 
-#Commands to load AzureADPreview modules
-if (invoke-AzureADPreview -eq 1) {
-    write-output "Invoking AzureADPreview failed. Exiting..." | out-host
-    Return 1
-}
 
-#Command to connect to AzureAD PowerShell app
-if (connect-aad -eq 1) {
-    write-output "Connecting to AzureAD failed. Exiting..." | out-host
-    Return 1
-}
 
 function Show-Menu
 {
@@ -320,10 +244,15 @@ try {
          'q' {
              Write-Host "You have selected quit"
              Write-Host "Ending script"
-             break
+             $Endscript = $True
              }
      }
 
+                If ($Endscript){
+                #Ending script
+                $Endscript = @()
+                Break
+                }
 
                 $YesOrNo = Read-Host "Please enter your response (y/n)"
                 while("y","n" -notcontains $YesOrNo )
@@ -341,7 +270,7 @@ try {
            #Check If there is a available licens to use
            Write-Host "Checking if there is a $SKUName available..."
            
-            #$SKUName = "Windows 365 Enterprise 2 vCPU, 8 GB, 128 GB"
+            
             $SKUNameSplit = $SKUName -split ","
 
             #CPU
@@ -359,7 +288,8 @@ try {
 
             $SkuPartNumber = "CPC_E_$($CPU)C_$($RAM)GB_$($Drive)GB​"
 
-            $GetSKU = Get-AzureADSubscribedSku | Where-Object {$_.SkuPartNumber -eq $SkuPartNumber}
+            
+            $GetSKU = Get-MgSubscribedSku | Where-Object {$_.SkuPartNumber -eq $SkuPartNumber}
 
             If (!($GetSKU)){
             Write-Host "Unable to find Licens $SKUName in Azure AD. Please check if you have the licens available"
@@ -382,7 +312,8 @@ try {
             $NewServicePlanID = $NewServiceplan.ServicePlanId
 
             #Checking user licens group
-            $UserDetails = Get-AzureADUser -Filter "userPrincipalName eq '$($CloudPC.UserPrincipalName)'"
+            
+            $UserDetails = Get-MgUser -Filter "userPrincipalName eq '$($CloudPC.UserPrincipalName)'"
             $CurrentSKUPartNumber = $CloudPC.ServicePlanName
             $CurrentSKUPartNumber = $CurrentSKUPartNumber -split " "
             $CurrentSKUPartNumber = $CurrentSKUPartNumber[3] -split "/"
@@ -404,7 +335,7 @@ try {
             $CurrentSkuPartNumber = "CPC_E_$($CurrentCPU)C_$($CurrentRAM)GB_$($CurrentDrive)GB​"
 
 
-            $GetCurrentSKU = Get-AzureADUserLicenseDetail -ObjectId $UserDetails.ObjectId | Where-Object {$_.SkuPartNumber -eq $CurrentSkuPartNumber}
+            $GetCurrentSKU = Get-MgUserLicenseDetail -UserId $UserDetails.Id | Where-Object {$_.SkuPartNumber -eq $CurrentSkuPartNumber}
             
             if ($GetCurrentSKU.SkuPartNumber -eq 'CPC_E_2C_4GB_64GB​'){
             $CurrentLicensGroup = $W365_2vCPU_4GB_64GB
@@ -447,7 +378,9 @@ try {
             }
 
             #Check licensgroup membership
-            $CheckCurrentlicensGroupMemberShip = Get-AzureADUserMembership -ObjectId $UserDetails.ObjectId | Select-Object DisplayName,ObjectID | Where-Object {$_.DisplayName -eq $CurrentLicensGroup}
+            
+           $GroupDetials = Get-MgGroup -Filter "DisplayName eq '$CurrentLicensGroup'"
+           $CheckCurrentlicensGroupMemberShip = Get-MgGroupMember -GroupId $GroupDetials.Id | Where-Object {$_.Id -eq $UserDetails.Id}
             if (!($CheckCurrentlicensGroupMemberShip)) {
             Write-Host "Unable to find User in licens group $CurrentLicensGroup"
             Write-Host "ending script"
@@ -457,7 +390,8 @@ try {
             #Removing user from Licens Group
             try {
             Write-Host "Removeing user from $CurrentLicensGroup"
-            Remove-AzureADGroupMember -ObjectId $CheckCurrentlicensGroupMemberShip.ObjectId -MemberId $UserDetails.ObjectId
+            
+            Invoke-GraphRequest -Method 'Delete' -Uri https://graph.microsoft.com/v1.0/groups/$($GroupDetials.Id)/members/$($UserDetails.Id)/`$ref
             }
             catch {
                
@@ -469,14 +403,8 @@ try {
             #Assing user licens directly
             try {
             Write-Host "Assiging current licens directly to user: $($CloudPC.UserPrincipalName)"
-             $LicenseSku = Get-AzureADSubscribedSku | Where {$_.SkuPartNumber -eq $GetCurrentSKU.SkuPartNumber}
-             $License = New-Object -TypeName Microsoft.Open.AzureAD.Model.AssignedLicense
-             $License.SkuId = $LicenseSku.SkuId
-             $AssignedLicenses = New-Object -TypeName Microsoft.Open.AzureAD.Model.AssignedLicenses
-
-
-             $AssignedLicenses.AddLicenses = $License
-             Set-AzureADUserLicense -ObjectId $UserDetails.ObjectId -AssignedLicenses $AssignedLicenses
+             
+             Set-MgUserLicense -UserId $UserDetails.Id -AddLicenses @{SkuId = $GetCurrentSKU.SkuId} -RemoveLicenses @() | out-null
              
 
             }
@@ -558,17 +486,10 @@ try {
             #Remove Direct licens from user
             try {
              Write-Host "Removing direct licens: '$SKUName' from user: $($CloudPC.UserPrincipalName)"        
-             $UserDetails = Get-AzureADUser -Filter "userPrincipalName eq '$($CloudPC.UserPrincipalName)'"
-             $GetCurrentSKU = Get-AzureADUserLicenseDetail -ObjectId $UserDetails.ObjectId | Where-Object {$_.SkuPartNumber -eq $SkuPartNumber}
-
-             $LicenseSku = $GetCurrentSKU
-             $License = New-Object -TypeName Microsoft.Open.AzureAD.Model.AssignedLicense
-             $License.SkuId = $LicenseSku.SkuId
-             $AssignedLicenses = New-Object -TypeName Microsoft.Open.AzureAD.Model.AssignedLicenses
-
-
-             $AssignedLicenses.RemoveLicenses = $License.SkuId
-             Set-AzureADUserLicense -ObjectId $UserDetails.ObjectId -AssignedLicenses $AssignedLicenses
+             
+             $NewLicenseSKU = Get-MgSubscribedSku | Where {$_.SkuPartNumber -eq $SkuPartNumber}
+             
+             Set-MgUserLicense -UserId $UserDetails.Id -AddLicenses @() -RemoveLicenses @($NewLicenseSKU.SkuId) | Out-Null
 
            
 
@@ -587,8 +508,9 @@ try {
             
             try {
             
-            $NewAzureADLicensGroupName = Get-AzureADGroup -Filter "displayname eq '$NewLicensGroup'"
-            Add-AzureADGroupMember -ObjectId $NewAzureADLicensGroupName.ObjectId -RefObjectId $UserDetails.ObjectId
+            
+            $NewAzureADLicensGroupName = Get-MgGroup -Filter "displayname eq '$NewLicensGroup'"
+            new-MgGroupMember -GroupId $NewAzureADLicensGroupName.Id -DirectoryObjectId $UserDetails.Id 
             Write-Host "User: $($CloudPC.UserPrincipalName) Has been added to the new licens group: $NewLicensGroup"
            
 
@@ -610,7 +532,7 @@ try {
             
 }
 catch {
-        #write-output "Failed to get Cloud PC: $CloudPCName" | out-host
+        
         write-output $_.Exception.Message | out-host
             
-}
+} 
