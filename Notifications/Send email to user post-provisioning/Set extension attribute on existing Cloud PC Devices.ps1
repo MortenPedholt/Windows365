@@ -1,9 +1,9 @@
     param(
              #Welcome Email Attribute Check
-            [parameter(HelpMessage = "Specify an exstension Attribute between 1 - 15 you want the script to use")]
+            [parameter(HelpMessage = "Specify an exstension Attribute between 1 - 15 you want the script to use. e.g. extensionAttribute3")]
             [string]$ExstensionAttributeKey = "",
 
-            [parameter(HelpMessage = "Value of exstension Attribute")]
+            [parameter(HelpMessage = "Value of exstension Attribute e.g. CPCWelcomeMailHaveBeenSent")]
             [string]$ExstensionAttributeValue = ""
 
      )
