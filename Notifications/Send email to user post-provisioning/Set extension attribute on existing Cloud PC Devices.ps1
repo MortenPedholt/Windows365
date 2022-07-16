@@ -1,14 +1,28 @@
     param(
              #Welcome Email Attribute Check
-            [parameter(HelpMessage = "Specify an exstension Attribute between 1 - 15 you want the script to use. e.g. extensionAttribute3")]
+            [parameter(HelpMessage = "Specify an extension Attribute between 1 - 15 you want the script to use. e.g. extensionAttribute3")]
             [string]$ExstensionAttributeKey = "",
 
             [parameter(HelpMessage = "Value of exstension Attribute e.g. CPCWelcomeMailHaveBeenSent")]
-            [string]$ExstensionAttributeValue = ""
+            [string]$ExstensionAttributeValue = "",
+
+            #Mail Contenct path
+            [parameter(HelpMessage = "Mail content path e.g. C:\temp\message.html")]
+            [string]$MailContentPath = "",
+            
+            #Email Attachment
+            [parameter(HelpMessage = "Leave this blank if no email attachment is required, else specify the location to an attachment. e.g. C:\temp\attachment.pdf")]
+            [string]$EmailAttachment = "",
+            
+            #Send Email Variable
+            [parameter(HelpMessage = "Email Subject of the email")]
+            [string]$EmailSubject = ""
+            
+                      
 
      )
- 
- #Function to check if MS.Graph module is installed and up-to-date
+
+#Function to check if MS.Graph module is installed and up-to-date
 function invoke-graphmodule {
     $graphavailable = (find-module -name microsoft.graph)
     $vertemp = $graphavailable.version.ToString()
@@ -76,7 +90,8 @@ $modules = @("Microsoft.Graph.Authentication",
              "Microsoft.Graph.Users.Actions",
              "Microsoft.Graph.DeviceManagement.Administration",
              "Microsoft.Graph.Users",
-             "Microsoft.Graph.Identity.DirectoryManagement"
+             "Microsoft.Graph.Identity.DirectoryManagement",
+             "Microsoft.Graph.DeviceManagement.Functions"
             )
 
 $WarningPreference = 'SilentlyContinue'
