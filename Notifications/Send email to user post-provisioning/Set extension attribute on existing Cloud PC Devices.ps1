@@ -4,22 +4,7 @@
             [string]$ExstensionAttributeKey = "",
 
             [parameter(HelpMessage = "Value of exstension Attribute e.g. CPCWelcomeMailHaveBeenSent")]
-            [string]$ExstensionAttributeValue = "",
-
-            #Mail Contenct path
-            [parameter(HelpMessage = "Mail content path e.g. C:\temp\message.html")]
-            [string]$MailContentPath = "",
-            
-            #Email Attachment
-            [parameter(HelpMessage = "Leave this blank if no email attachment is required, else specify the location to an attachment. e.g. C:\temp\attachment.pdf")]
-            [string]$EmailAttachment = "",
-            
-            #Send Email Variable
-            [parameter(HelpMessage = "Email Subject of the email")]
-            [string]$EmailSubject = ""
-            
-                      
-
+            [string]$ExstensionAttributeValue = ""
      )
 
 #Function to check if MS.Graph module is installed and up-to-date
