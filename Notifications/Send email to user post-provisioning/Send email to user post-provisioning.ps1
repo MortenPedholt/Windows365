@@ -1,17 +1,17 @@
-param(
+ param(
              #Welcome Email Attribute Check
-            [parameter(HelpMessage = "Specify a Exstension Attribute between 1 - 15 you want the script to use")]
+            [parameter(HelpMessage = "Specify an extension Attribute between 1 - 15 you want the script to use. e.g. extensionAttribute3")]
             [string]$ExstensionAttributeKey = "",
 
-            [parameter(HelpMessage = "Value of Device Attribute")]
+            [parameter(HelpMessage = "Value of exstension Attribute e.g. CPCWelcomeMailHaveBeenSent")]
             [string]$ExstensionAttributeValue = "",
 
             #Mail Contenct path
-            [parameter(HelpMessage = "Mail content path")]
+            [parameter(HelpMessage = "Mail content path e.g. C:\temp\message.html")]
             [string]$MailContentPath = "",
             
             #Email Attachment
-            [parameter(HelpMessage = "Leave this blank if no email attachment is required, else specify the location to an attachment. Max 4 MB.")]
+            [parameter(HelpMessage = "Leave this blank if no email attachment is required, else specify the location to an attachment. e.g. C:\temp\attachment.pdf")]
             [string]$EmailAttachment = "",
             
             #Send Email Variable
@@ -21,9 +21,6 @@ param(
                       
 
      )
-
-
-
 
 #Function to check if MS.Graph module is installed and up-to-date
 function invoke-graphmodule {
@@ -93,7 +90,8 @@ $modules = @("Microsoft.Graph.Authentication",
              "Microsoft.Graph.Users.Actions",
              "Microsoft.Graph.DeviceManagement.Administration",
              "Microsoft.Graph.Users",
-             "Microsoft.Graph.Identity.DirectoryManagement"
+             "Microsoft.Graph.Identity.DirectoryManagement",
+             "Microsoft.Graph.DeviceManagement.Functions"
             )
 
 $WarningPreference = 'SilentlyContinue'
@@ -243,12 +241,7 @@ Foreach ($CPCDeviceInfo in $AllCPCDevices){
                            
                             Send-MgUserMail -UserId $EmailUserDetails.Id -BodyParameter $params
                                 
-                               
-                                
-
-           
-                                           
-                                            
+     
                                             try{  
                                                     #Set Attribute on Azure AD Device
                                                     Write-Host "Setting Attribute on AzureAD Device:'$($CPCDeviceInfo.DisplayName)'"
@@ -271,11 +264,7 @@ Foreach ($CPCDeviceInfo in $AllCPCDevices){
 
                                             }
             
-                                           
-           
-           
-      
-           
+
             }
                 
                 }
@@ -295,32 +284,4 @@ Foreach ($CPCDeviceInfo in $AllCPCDevices){
 }
 
 
-}
-
-  <#     
-       
-          #Set Attribute on Azure AD Device
-            $params = @{
-            "extensionAttributes" = @{
-              #Attribute check for if this is a new CloudPC
-              "extensionAttribute3" = "$WelcomeEmailHasBeenSendt"
-               }
-            }
-            
-            Update-MgDevice -DeviceId $CPCDeviceInfo.Id -BodyParameter ($params | ConvertTo-Json)
-
- 
-
-#Set Attribute parameter
-$params = @{
-   "extensionAttributes" = @{
-      #Attribute check for if this is a new CloudPC
-      "extensionAttribute3" = "UserGuideHasBeenSent"
-   }
-}
-
-
-
-$CPCDeviceInfo.ExtensionAttributes
-
-#>
+} 
