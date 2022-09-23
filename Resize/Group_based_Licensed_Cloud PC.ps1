@@ -41,8 +41,8 @@ function invoke-graphmodule {
         if ($graphcurrent -eq $null) {
             write-output "Module is not installed. Installing..." | out-host
             try {
-                Install-Module -name $module -RequiredVersion 1.11.1 -Force -ErrorAction Stop 
-                Import-Module -name $module -RequiredVersion 1.11.1 -force -ErrorAction Stop 
+                Install-Module -name $module -Force -ErrorAction Stop 
+                Import-Module -name $module -force -ErrorAction Stop 
 
                 }
             catch {
