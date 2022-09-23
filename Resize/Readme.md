@@ -3,7 +3,7 @@
 ## 23 September 2022
 - Microsoft.graph module 1.12.1 breaks some of the cmdlet being used in the script.
   Therefore you must use version 1.11.1 in order for the script to work. If you have installed any version 1.12.1 for the required modules.
-  you will have to uninstall them by using "uninstall-module -Name [MODULENAME]"
+  you will have to uninstall them by using "uninstall-module -Name [MODULENAME] -version 1.12.1"
 - If the modules arent installed on the system it will now automaticlly install 1.11.1 version instead of 1.12.1
   Big shout out to @Mathias_T_C for location this issue!
 
