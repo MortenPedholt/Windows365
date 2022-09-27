@@ -365,7 +365,7 @@ try {
             $CurrentLicensGroup = $W365_8vCPU_32GB_128GB
             }
             elseif($GetCurrentSKU.SkuPartNumber -eq 'CPC_E_8C_32GB_256GB​'){
-            $CurrentLicensGroup = $W365_8vCPU_8GB_256GB
+            $CurrentLicensGroup = $W365_8vCPU_32GB_256GB
             }
             elseif($GetCurrentSKU.SkuPartNumber -eq 'CPC_E_8C_32GB_512GB​'){
             $CurrentLicensGroup = $W365_8vCPU_32GB_512GB
