@@ -1,6 +1,7 @@
 # Description of Cloud PC Azure AD Cleanup
-Currently Windows 365 does not support resize in MEM portal if users have been assigned a license through group-based licensed.
-
+When a Cloud PC is being deprecated by the Windows 365 service it deletes the object in Microsoft Endpoint Manager.
+It does however not delete the Azure AD object, which can lead to many stale devices in Azure AD.
+This script can help clean up in your Azure AD. This script only works with Cloud PC Devices and not any other devices in Azure AD.
 
 # Required PowerShell Modules
 
