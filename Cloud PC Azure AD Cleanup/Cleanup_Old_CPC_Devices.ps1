@@ -8,7 +8,7 @@ Param(
     [Int]$GracePeriod = 0,
 
     [parameter(HelpMessage = "Setting to 'true' will delete devices, 'false' will not deleted devices.")] 
-    [string]$DeleteOldCloudPCDevices = $false
+    [string]$DeleteOldCloudPCDevices = $True
 
 )
 
@@ -177,7 +177,7 @@ If ($CloudPCDevice){
                                     Write-Output "Cloud PC is out of Grace Period, Cloud PC will be deleted."
                                     Write-Output "Performing delete action on Cloud PC..."
                                      
-                                    Remove-MgDevice -DeviceId $StaleDevice.DeviceId 
+                                    Remove-MgDevice -DeviceId $StaleDevice.Id 
 
                                     #Adding value to .csv output
                                     $csvoutput.InGracePeriod = "False"
@@ -194,7 +194,7 @@ If ($CloudPCDevice){
                             }else {
                                 #Delete old Cloud PC
                                 Write-Output "Performing delete action on Cloud PC..."
-                                Remove-MgDevice -DeviceId $StaleDevice.DeviceId 
+                                Remove-MgDevice -DeviceId $StaleDevice.Id
                                 $csvoutput.InGracePeriod = "Not configured"
                                 $csvoutput.DeletionStatus = "Deleted"
                             }
