@@ -4,8 +4,8 @@ Param(
     [parameter(HelpMessage = "Specifying a path will export .csv report. Leave the variable blank for no report")] 
     [string]$ExportToCSV = "C:\temp",
 
-    [parameter(HelpMessage = "Specifying '0' will delete all old devices. adding a higher number like '100' will only deleted old devices older than 100 days.")] 
-    [Int]$GracePeriod = 50,
+    [parameter(HelpMessage = "Adding a higher number like '100' will only delete old devices older than 100 days. Specifying '0' will delete all old devices, no matter how old they are.")] 
+    [Int]$GracePeriod = 0,
 
     [parameter(HelpMessage = "Setting to 'true' will delete devices, 'false' will not deleted devices.")] 
     [string]$DeleteOldCloudPCDevices = $false
@@ -149,6 +149,7 @@ If ($CloudPCDevice){
     Write-Output "Cloud PC is exist in Endpoint Manager and is therefore 'Active'."
     $csvoutput.InGracePeriod = "Cloud PC in use"
     $csvoutput.DeletionStatus = "Cloud PC in use"
+    Write-Output ""
 
 }else {
     #Starting delete flow
@@ -176,7 +177,7 @@ If ($CloudPCDevice){
                                     Write-Output "Cloud PC is out of Grace Period, Cloud PC will be deleted."
                                     Write-Output "Performing delete action on Cloud PC..."
                                      
-                                    #Remove-MgDevice -DeviceId $StaleDevice.DeviceId 
+                                    Remove-MgDevice -DeviceId $StaleDevice.DeviceId 
 
                                     #Adding value to .csv output
                                     $csvoutput.InGracePeriod = "False"
@@ -193,7 +194,7 @@ If ($CloudPCDevice){
                             }else {
                                 #Delete old Cloud PC
                                 Write-Output "Performing delete action on Cloud PC..."
-                                #Remove-MgDevice -DeviceId $StaleDevice.DeviceId 
+                                Remove-MgDevice -DeviceId $StaleDevice.DeviceId 
                                 $csvoutput.InGracePeriod = "Not configured"
                                 $csvoutput.DeletionStatus = "Deleted"
                             }
