@@ -17,7 +17,8 @@ This script uses 'Microsoft.Graph' modules. The script only installs the Microso
 The account you are running the script with needs to have the following Microsoft Graph API Permissions:
 
 - CloudPC.Read.All
-- Directory.ReadWrite.All
+- Device.Read.All
+- Directory.AccessAsUser.All
 
 
 # Usage
