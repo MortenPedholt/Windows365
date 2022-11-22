@@ -1,0 +1,10 @@
+IntuneDevices 
+| where DeviceName startswith "CPC-"
+| join (
+SigninLogs 
+| where TimeGenerated  > ago(30d)
+| where AppDisplayName == "Windows Sign In"
+| extend DeviceName_SignInLogs = tostring(DeviceDetail.displayName)
+) on $left.DeviceName == $right.DeviceName_SignInLogs
+| summarize arg_max(TimeGenerated1, *) by DeviceName
+| project DeviceName, TimeGenerated1, UserPrincipalName, CreatedDate
